@@ -48,19 +48,35 @@ class VirtualAssistant:
             self.response_label.config(text=response)
 
     def virtual_assistant(self, user_input):
-        if len(user_input.split()) > 1:
-            return "Please ask only one-word questions."
+        # Maximum number of characters to display in the text box
+        max_chars = 280  # You can adjust this value as needed
 
         url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{user_input}"
         headers = {'User-Agent': 'Mozilla/5.0'}
-        response = requests.get(url, headers=headers)
-        data = response.json()
-
-        if 'extract' in data:
-            summary = data['extract']
-            return summary.split('\n')[0]  # Get the first sentence from the summary
-        else:
-            return "Sorry, I couldn't find any information on that topic."
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if 'extract' in data:
+                    summary = data['extract']
+                    # End the summary at the last complete sentence within max_chars
+                    if len(summary) > max_chars:
+                        truncated_summary = summary[:max_chars]
+                        last_period = truncated_summary.rfind('.')
+                        if last_period == -1:
+                            # No period found, so we have to cut off without ending a sentence
+                            return truncated_summary + "..."
+                        else:
+                            # End after the last complete sentence
+                            return truncated_summary[:last_period + 1]
+                    else:
+                        return summary
+                else:
+                    return "Sorry, I couldn't find any information on that topic."
+            else:
+                return "Sorry, there was an error fetching the information."
+        except requests.RequestException:
+            return "An error occurred while trying to fetch data."
 
 
 if __name__ == "__main__":
