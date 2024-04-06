@@ -1,5 +1,3 @@
-Author: Kester Nkese
-
 A.L.I.E. (Artificial Listening Interactive Entity) is a Python-based virtual assistant
 that employs a graphical user interface (GUI) to facilitate user interaction.
 Users can ask one-word questions, and A.L.I.E. uses the Wikipedia API to fetch
